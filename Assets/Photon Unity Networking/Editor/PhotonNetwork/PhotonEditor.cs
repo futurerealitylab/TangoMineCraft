@@ -475,7 +475,7 @@ public class PhotonEditor : EditorWindow
             GUILayout.Space(15);
         }
 #if !(UNITY_5_0 || UNITY_5)
-        else if (!InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.Android) || !InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.iOS))
+        else if (!InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.Android) || !InternalEditorUtility.HasAdvancedLicenseOnBuildTarget(BuildTarget.iPhone))
         {
             GUILayout.Label(CurrentLang.MobileExportNoteLabel);
             GUILayout.Space(15);
