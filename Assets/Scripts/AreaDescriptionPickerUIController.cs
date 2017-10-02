@@ -31,6 +31,7 @@ using UnityEngine.UI;
 /// </summary>
 public class AreaDescriptionPickerUIController : Photon.PunBehaviour, ITangoLifecycle
 {
+    public CreateRoomOrJoin crj;
     /// <summary>
     /// The prefab of a standard button in the scrolling list.
     /// </summary>
@@ -144,6 +145,7 @@ public class AreaDescriptionPickerUIController : Photon.PunBehaviour, ITangoLife
     /// <param name="isJoin">If the client is hosting or joining game.</param>
     public void JoinOrCreateGame(bool isJoin)
     {
+        crj.isJoin = isJoin;
         if (!PhotonNetwork.insideLobby)
         {
             AndroidHelper.ShowAndroidToastMessage("Please wait to join or create the room until you are in lobby.");
@@ -153,16 +155,29 @@ public class AreaDescriptionPickerUIController : Photon.PunBehaviour, ITangoLife
 
         if (isJoin)
         {
-            Globals.m_curAreaDescription = null;
+            ///here as fy to change the staffs
+            crj.isJoin = isJoin;
+            //Globals.m_curAreaDescription = null;
             if (PhotonNetwork.GetRoomList().Length == 0)
             {
                 AndroidHelper.ShowAndroidToastMessage("There's no room in the lobby.");
                 Debug.Log("There's no room in the lobby." + Environment.StackTrace);
                 return;
             }
+#if UNITY_EDITOR
+            Globals.m_curAreaDescription = AreaDescription.ForUUID("abc");
+#else
+            if (Globals.m_curAreaDescription == null)
+            {
+                AndroidHelper.ShowAndroidToastMessage("No Area Description selected.");
+                Debug.Log("No Area Description selected." + Environment.StackTrace);
+                return;
+            }
+#endif
         }
         else
         {
+            crj.isJoin = isJoin;
 #if UNITY_EDITOR
             Globals.m_curAreaDescription = AreaDescription.ForUUID("abc");
 #else

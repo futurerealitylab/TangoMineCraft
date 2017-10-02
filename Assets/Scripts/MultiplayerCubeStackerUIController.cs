@@ -42,7 +42,8 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
 {
     //here as FY, I added the pointcloud for the real world interaction
     //public TangoPointCloud m_pointCloud;
-    
+    public GameObject crj;
+    public bool isJoin = false;
     /// <summary>
     /// The list of cube prefabs.
     /// 
@@ -131,6 +132,9 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
     /// </summary>
     public void Start()
     {
+        crj = GameObject.Find("CreateRoomOrJoin");
+        isJoin = crj.GetComponent<CreateRoomOrJoin>().isJoin;
+
         m_cubeSize = m_cubePrefab[0].transform.lossyScale.x;
 
         m_progressPanel.SetActive(false);
@@ -142,20 +146,21 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
 
         m_tangoApplication.Register(this);
         m_tangoApplication.RequestPermissions();
-
+        /*
         m_fileSender = GetComponent<RPCFileSender>();
         m_fileSender.OnPackageReceived += _OnAreaDescriptionTransferReceived;
         m_fileSender.OnPackageTransferFinished += _OnAreaDescriptionTransferFinished;
         m_fileSender.OnPackageTransferStarted += _OnAreaDescriptionTransferStarted;
         m_fileSender.OnPackageTransferError += _OnAreaDescriptionTransferError;
-
+        */
         if (!PhotonNetwork.insideLobby)
         {
             AndroidHelper.ShowAndroidToastMessage("Please wait to join the room until you are in lobby.");
             return;
         }
-        
-        if (Globals.m_curAreaDescription == null)
+
+        //if (Globals.m_curAreaDescription == null)
+        if (isJoin)
         {
             PhotonNetwork.JoinRandomRoom();
         }
@@ -372,7 +377,8 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
         dataArr = File.ReadAllBytes(path);
 #endif
         // Send out the Area Description File.
-        m_fileSender.SendPackage(newPlayer, dataArr);
+       //fy here
+        // m_fileSender.SendPackage(newPlayer, dataArr);
 
         foreach (KeyValuePair<Vector3, GameObject> entry in m_cubeList)
         {
