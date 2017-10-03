@@ -14,3 +14,6 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/TangoSDK/Examples/Scenes/AreaLearning.unity
     guid: 3fe863707b0b9426d9ea313be426fbf5
+  - enabled: 0
+    path: Assets/TangoSDK/Examples/Scenes/AreaDescriptionManagement.unity
+    guid: 2ed91207e1f3949a79b14b2435302de1

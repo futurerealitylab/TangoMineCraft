@@ -42,6 +42,7 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
 {
     //here as FY, I added the pointcloud for the real world interaction
     //public TangoPointCloud m_pointCloud;
+    public TouchEventController touchEvent;
     public GameObject crj;
     public bool isJoin = false;
     /// <summary>
@@ -180,7 +181,7 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
 #if UNITY_EDITOR
         if(Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Alpha1))
         {
-            AddCube();
+           // AddCube();
         }
 
         if(Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Alpha2))
@@ -426,7 +427,7 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
     /// <summary>
     /// Add a cube to the scene.
     /// </summary>
-    public void AddCube()
+    public void AddCube(RaycastHit hitInfo)
     {
         if (m_localPlayer == null)
         {
@@ -434,8 +435,8 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
             return;
         }
         
-        RaycastHit hitInfo;
-        Camera cam = m_localPlayer.GetComponentInChildren<Camera>();
+        //RaycastHit hitInfo;
+        //Camera cam = m_localPlayer.GetComponentInChildren<Camera>();
         /*Vector2 centerPoint = new Vector2(Screen.width / 2, Screen.height / 2);
         Vector3 hitPointOnRealWorld;
         Plane plane;
@@ -459,10 +460,10 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
         }
         else
         {*/
-            if (Physics.Raycast(cam.transform.position,
-                                cam.transform.forward,
-                                out hitInfo, RAYCAST_MAX_DISTANCE))
-            {
+            //if (Physics.Raycast(cam.transform.position,
+                                //cam.transform.forward,
+                                //out hitInfo, RAYCAST_MAX_DISTANCE))
+            //{
                 Vector3 center = (hitInfo.point / m_cubeSize) + (hitInfo.normal * m_cubeSize);
                 float x = Mathf.Floor(center.x + m_cubeSize);
                 float y = Mathf.Floor(center.y + m_cubeSize);
@@ -480,13 +481,13 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
                     Debug.Log("Index out of bound\n" + Environment.StackTrace);
                 }
 
-                Vector3 p = (center * m_cubeSize) - new Vector3(0.0f, m_cubeSize / 2.0f, 0.0f);
-
+        //Vector3 p = (center * m_cubeSize) - new Vector3(0.0f, m_cubeSize / 2.0f, 0.0f);
+                Vector3 p = center * m_cubeSize;
                 GetComponent<PhotonView>().RPC("_AddCubeAt",
                                                PhotonTargets.AllViaServer,
                                                p, m_currentCubeIndex, new Vector3(xIndex, yIndex, zIndex));
             //}
-        }
+        //}
     }
     
     /// <summary>
@@ -506,8 +507,9 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
                             cam.transform.forward,
                             out hitInfo, RAYCAST_MAX_DISTANCE))
         {
-            Vector3 p = (hitInfo.collider.gameObject.transform.position + new Vector3(0.0f, m_cubeSize / 2.0f, 0.0f)) /
-                m_cubeSize;
+            //Vector3 p = (hitInfo.collider.gameObject.transform.position + new Vector3(0.0f, m_cubeSize / 2.0f, 0.0f)) /
+            //    m_cubeSize;
+            Vector3 p = hitInfo.collider.gameObject.transform.position / m_cubeSize;
             int xIndex = (int)p.x + (WORLD_SIZE / 2);
             int yIndex = (int)p.y + (WORLD_SIZE / 2);
             int zIndex = (int)p.z + (WORLD_SIZE / 2);
@@ -522,7 +524,17 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
                                            PhotonTargets.AllViaServer, new Vector3(xIndex, yIndex, zIndex));
         }
     }
-
+    public void removeAll()
+    {
+        foreach (KeyValuePair<Vector3, GameObject> entry in m_cubeList)
+        {
+            Vector3 key = entry.Key;
+            GameObject value = entry.Value;
+            GetComponent<PhotonView>().RPC("_RemoveCubeAt",
+                                           PhotonTargets.AllViaServer,
+                                           key);
+        }
+    }
     /// <summary>
     /// Callback from FileSender. Called when the m_fileSender started transfer Area Description File.
     /// </summary>
@@ -608,6 +620,7 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
         if (!m_cubeList.ContainsKey(key))
         {
             Debug.LogError("Cube index doesn't exsited");
+            AndroidHelper.ShowAndroidToastMessage("didn't find cube to remove");
             return;
         }
 
@@ -626,6 +639,11 @@ public class MultiplayerCubeStackerUIController : Photon.PunBehaviour, ITangoAre
         m_uiBackgroundOverlay.SetActive(false);
         m_localPlayer.GetComponentInChildren<TangoARPoseController>().enabled = true;
         m_localPlayer.GetComponentInChildren<Camera>().enabled = true;
+        //fy
+        if (touchEvent != null)
+        {
+            touchEvent.setCam(m_localPlayer.GetComponentInChildren<Camera>());
+        }
     }
 
     /// <summary>
