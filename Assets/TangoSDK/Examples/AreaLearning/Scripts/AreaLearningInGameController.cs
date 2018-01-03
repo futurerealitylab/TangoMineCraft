@@ -307,7 +307,7 @@ public class AreaLearningInGameController : MonoBehaviour, ITangoPose, ITangoEve
             GUI.FocusControl("TextField");
 
             if (GUI.Button(okButtonRect, "OK")
-                || (Event.current.type == EventType.keyDown && Event.current.character == '\n'))
+                || (Event.current.type == EventType.KeyDown && Event.current.character == '\n'))
             {
                 m_displayGuiTextInput = false;
                 m_guiTextInputResult = true;
